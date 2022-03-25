@@ -1,0 +1,335 @@
+#include <bits/stdc++.h>
+using namespace std;
+using namespace std::chrono;
+
+void random_test(int n, int max, int arr[])
+{
+    srand((unsigned)time(0));
+    int random;
+    for(int i = 0; i < n; i++){
+        random=rand()*rand()%max;
+        arr[i] = random;
+    }
+
+
+}
+
+//radix
+
+int Max(int arr[], int n)
+{
+    int max = arr[0];
+    for (int i = 1; i < n; i++)
+        if (arr[i] > max)
+            max = arr[i];
+    return max;
+}
+
+void count(int arr[], int n, int exp)
+{
+    int output[n];
+    int i, count[10] = { 0 };
+
+    for (i = 0; i < n; i++)
+        count[(arr[i] / exp) % 10]++;
+
+    for (i = 1; i < 10; i++)
+        count[i] += count[i - 1];
+
+    for (i = n - 1; i >= 0; i--) {
+        output[count[(arr[i] / exp) % 10] - 1] = arr[i];
+        count[(arr[i] / exp) % 10]--;
+    }
+
+    for (i = 0; i < n; i++)
+        arr[i] = output[i];
+}
+
+void radix(int arr[], int n)
+{
+    int m = Max(arr, n);
+    for (int exp = 1; m / exp > 0; exp *= 10)
+        count(arr, n, exp);
+}
+
+//merge
+
+void merge(int array[], int const stg, int const cnt, int const drp)
+{
+    auto const sub1 = cnt - stg + 1;
+    auto const sub2 = drp - cnt;
+
+    auto *stgArray = new int[sub1],
+            *drpArray = new int[sub2];
+    for (auto i = 0; i < sub1; i++)
+        stgArray[i] = array[stg + i];
+    for (auto j = 0; j < sub2; j++)
+        drpArray[j] = array[cnt + 1 + j];
+
+    auto indexsub1 = 0,
+            indexsub2 = 0;
+    int indexmerge = stg;
+    while (indexsub1 < sub1 && indexsub2 < sub2) {
+        if (stgArray[indexsub1] <= drpArray[indexsub2]) {
+            array[indexmerge] = stgArray[indexsub1];
+            indexsub1++;
+        }
+        else {
+            array[indexmerge] = drpArray[indexsub2];
+            indexsub2++;
+        }
+        indexmerge++;
+    }
+    while (indexsub1 < sub1) {
+        array[indexmerge] = stgArray[indexsub1];
+        indexsub1++;
+        indexmerge++;
+    }
+    while (indexsub2 < sub2) {
+        array[indexmerge] = drpArray[indexsub2];
+        indexsub2++;
+        indexmerge++;
+    }
+}
+
+void mergeSort(int array[], int const begin, int const end)
+{
+    if (begin >= end)
+        return;
+
+    auto cnt = begin + (end - begin) / 2;
+    mergeSort(array, begin, cnt);
+    mergeSort(array, cnt + 1, end);
+    merge(array, begin, cnt, end);
+}
+
+//shell
+
+int shellSort(int arr[], int n)
+{
+
+    for (int gap = n/2; gap > 0; gap /= 2)
+    {
+        for (int i = gap; i < n; i += 1)
+        {
+            int temp = arr[i];
+            int j;
+            for (j = i; j >= gap && arr[j - gap] > temp; j -= gap)
+                arr[j] = arr[j - gap];
+            arr[j] = temp;
+        }
+    }
+    return 0;
+}
+
+//bubble
+
+void swap(int *x, int *y)
+{
+    int temp = *x;
+    *x = *y;
+    *y = temp;
+}
+
+void bubbleSort(int arr[], int n)
+{
+    int i, j;
+    for (i = 0; i < n-1; i++)
+
+        for (j = 0; j < n-i-1; j++)
+            if (arr[j] > arr[j+1])
+                swap(&arr[j], &arr[j+1]);
+}
+
+//quick
+
+int partition(int arr[], int start, int end)
+{
+
+    int pv = arr[start];
+
+    int count2 = 0;
+    for (int i = start + 1; i <= end; i++) {
+        if (arr[i] <= pv)
+            count2++;
+    }
+    int pvindex = start + count2;
+    swap(arr[pvindex], arr[start]);
+    int i = start, j = end;
+
+    while (i < pvindex && j > pvindex) {
+
+        while (arr[i] <= pv) {
+            i++;
+        }
+
+        while (arr[j] > pv) {
+            j--;
+        }
+
+        if (i < pvindex && j > pvindex) {
+            swap(arr[i++], arr[j--]);
+        }
+    }
+
+    return pvindex;
+}
+
+void quickSort(int arr[], int start, int end)
+{
+    if (start >= end)
+        return;
+
+    int p = partition(arr, start, end);
+
+    quickSort(arr, start, p - 1);
+
+    quickSort(arr, p + 1, end);
+}
+
+//heap
+
+void heapify(int arr[], int n, int i)
+{
+    int cmmare = i;
+    int a = 2 * i + 1;
+    int b = 2 * i + 2;
+
+    if (a < n && arr[a] > arr[cmmare])
+        cmmare = a;
+
+    if (b < n && arr[b] > arr[cmmare])
+        cmmare = b;
+
+    if (cmmare != i) {
+        swap(arr[i], arr[cmmare]);
+        heapify(arr, n, cmmare);
+    }
+}
+
+void heapSort(int arr[], int n)
+{
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+
+    for (int i = n - 1; i > 0; i--) {
+        swap(arr[0], arr[i]);
+        heapify(arr, i, 0);
+    }
+}
+
+void print(int arr[], int n)
+{
+    for (int i = 0; i < n; i++)
+        cout << arr[i] << " ";
+}
+
+int main()
+{
+    int nr_test, n, max, i, j;
+    cin >> nr_test;
+
+    for (i = 0; i < nr_test; i++){
+        cin >> n >> max;
+        cout << "Testul: " << i+1 << ", N= " << n << ", Maxim= " << max << "\n";
+        int arr[n];
+        random_test(n, max, arr);
+        int vec[n];
+        for(j = 0; j < n; j++){
+            vec[j] = arr[j];
+        }
+        auto start = high_resolution_clock::now();
+        sort(vec,vec+n);
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        cout << "Timp de sortare STL: " << setprecision(9) << showpoint
+                                        << fixed << duration.count() / 1000000.00000000000000
+                                        << " secunde" << '\n';
+        for(int j = 0; j < n; j++)
+            vec[j]=0;
+
+        for(j = 0; j < n; j++){
+            vec[j] = arr[j];
+        }
+        start = high_resolution_clock::now();
+        radix(vec, n);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        cout << "Timp de sortare Radix: " << setprecision(9) << showpoint
+             << fixed << duration.count() / 1000000.00000000000000
+             << " secunde" << '\n';
+        for(int j = 0; j < n; j++)
+            vec[j]=0;
+
+        for(j = 0; j < n; j++){
+            vec[j] = arr[j];
+        }
+        start = high_resolution_clock::now();
+        mergeSort(vec, 0, n - 1);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        cout << "Timp de sortare Merge: " << setprecision(9) << showpoint
+             << fixed << duration.count() / 1000000.00000000000000
+             << " secunde" << '\n';
+        for(int j = 0; j < n; j++)
+            vec[j]=0;
+
+        for(j = 0; j < n; j++){
+            vec[j] = arr[j];
+        }
+        start = high_resolution_clock::now();
+        shellSort(vec, n);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        cout << "Timp de sortare Shell: " << setprecision(9) << showpoint
+             << fixed << duration.count() / 1000000.00000000000000
+             << " secunde" << '\n';
+        for(int j = 0; j < n; j++)
+            vec[j]=0;
+
+        for(j = 0; j < n; j++){
+            vec[j] = arr[j];
+        }
+        start = high_resolution_clock::now();
+        bubbleSort(vec, n);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        cout << "Timp de sortare Bubble: " << setprecision(9) << showpoint
+             << fixed << duration.count() / 1000000.00000000000000
+             << " secunde" << '\n';
+        for(int j = 0; j < n; j++)
+            vec[j]=0;
+
+        for(j = 0; j < n; j++){
+            vec[j] = arr[j];
+        }
+        start = high_resolution_clock::now();
+        quickSort(vec, 0, n-1);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        cout << "Timp de sortare Quick: " << setprecision(9) << showpoint
+             << fixed << duration.count() / 1000000.00000000000000
+             << " secunde" << '\n';
+        for(int j = 0; j < n; j++)
+            vec[j]=0;
+
+        for(j = 0; j < n; j++){
+            vec[j] = arr[j];
+        }
+        start = high_resolution_clock::now();
+        heapSort(vec, n);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        cout << "Timp de sortare Heap: " << setprecision(9) << showpoint
+             << fixed << duration.count() / 1000000.00000000000000
+             << " secunde" << '\n';
+        for(int j = 0; j < n; j++)
+            vec[j]=0;
+
+        for(int j = 0; j < n; j++)
+            arr[j] =0;
+
+    }
+    return 0;
+
+}
